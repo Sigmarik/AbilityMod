@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "pinpoint",
+  "id": "abilitymod",
   "version": "${version}",
 
   "name": "Ability Mod",
