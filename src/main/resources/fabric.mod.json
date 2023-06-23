@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "pinpoint",
+  "version": "${version}",
+
+  "name": "Ability Mod",
+  "description": "Adds roles with unique abilities to the game.",
+  "authors": [
+    "Sigmarionid"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Sigmarik"
+  },
+
+  "license": "MIT",
+  "icon": "assets/abilitymod/icon.png",
+
+  "environment": "server",
+  "entrypoints": {
+    "server": [
+      "net.sigmarik.abilitymod.AbilityMod"
+    ]
+  },
+  "mixins": [
+    "abilitymod.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.11",
+    "fabric-api": "*",
+    "minecraft": "~1.19.4",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
