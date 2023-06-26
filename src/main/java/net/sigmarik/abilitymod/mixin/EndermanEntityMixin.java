@@ -7,7 +7,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.sigmarik.abilitymod.AbilityMod;
-import net.sigmarik.abilitymod.util.TraitStates;
+import net.sigmarik.abilitymod.util.ServerState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,6 +22,6 @@ public abstract class EndermanEntityMixin extends HostileEntity implements Anger
 
     @Inject(method = "isPlayerStaring", at = @At("HEAD"), cancellable = true)
     private void traitedIsStaring(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
-        if (TraitStates.hasTrait(player, AbilityMod.TRAIT_NO_EYE_AGGRO)) cir.setReturnValue(false);
+        if (ServerState.hasTrait(player, AbilityMod.TRAIT_NO_EYE_AGGRO)) cir.setReturnValue(false);
     }
 }

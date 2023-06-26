@@ -10,7 +10,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.sigmarik.abilitymod.AbilityMod;
-import net.sigmarik.abilitymod.util.TraitStates;
+import net.sigmarik.abilitymod.util.ServerState;
 
 import java.util.Set;
 
@@ -39,7 +39,7 @@ public class TraitCommand {
         java.util.Collection<net.minecraft.server.network.ServerPlayerEntity> players =
                 EntityArgumentType.getPlayers(context, "players");
 
-        TraitStates states = TraitStates.getTraitStates(context.getSource().getServer());
+        ServerState states = ServerState.getTraitStates(context.getSource().getServer());
 
         for (ServerPlayerEntity player : players) {
             AbilityMod.LOGGER.info("Adding trait " + trait + " to player " + player.getName().getString());
@@ -57,7 +57,7 @@ public class TraitCommand {
         java.util.Collection<net.minecraft.server.network.ServerPlayerEntity> players =
                 EntityArgumentType.getPlayers(context, "players");
 
-        TraitStates states = TraitStates.getTraitStates(context.getSource().getServer());
+        ServerState states = ServerState.getTraitStates(context.getSource().getServer());
 
         for (ServerPlayerEntity player : players) {
             AbilityMod.LOGGER.info("Removing trait " + trait + " from player " + player.getName().getString());
@@ -73,7 +73,7 @@ public class TraitCommand {
     private static int printTraits(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
 
-        TraitStates states = TraitStates.getTraitStates(player.server);
+        ServerState states = ServerState.getTraitStates(player.server);
         Set<String> traits = states.getTraitList(player.getUuid()).getKeys();
 
         if (traits.isEmpty()) {

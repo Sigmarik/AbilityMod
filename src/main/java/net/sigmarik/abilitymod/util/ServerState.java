@@ -10,9 +10,8 @@ import net.sigmarik.abilitymod.AbilityMod;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class TraitStates extends PersistentState {
+public class ServerState extends PersistentState {
     public HashMap<UUID, NbtCompound> traits = new HashMap<>();
-
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
@@ -27,8 +26,8 @@ public class TraitStates extends PersistentState {
         return nbt;
     }
 
-    public static TraitStates createFromNbt(NbtCompound nbt) {
-        TraitStates states = new TraitStates();
+    public static ServerState createFromNbt(NbtCompound nbt) {
+        ServerState states = new ServerState();
         states.traits.clear();
 
         NbtCompound player_data = nbt.getCompound(AbilityMod.MOD_ID + ":player_traits");
@@ -69,16 +68,16 @@ public class TraitStates extends PersistentState {
         }
     }
 
-    public static TraitStates getTraitStates(MinecraftServer server) {
+    public static ServerState getTraitStates(MinecraftServer server) {
         PersistentStateManager manager = server.getOverworld().getPersistentStateManager();
 
-        return manager.getOrCreate(TraitStates::createFromNbt, TraitStates::new, AbilityMod.MOD_ID);
+        return manager.getOrCreate(ServerState::createFromNbt, ServerState::new, AbilityMod.MOD_ID);
     }
 
     public static boolean hasTrait(PlayerEntity player, String trait) {
         if (player.getServer() == null) return false;
 
-        TraitStates states = getTraitStates(player.getServer());
+        ServerState states = getTraitStates(player.getServer());
 
         if (!states.traits.containsKey(player.getUuid())) return false;
         NbtCompound playerTraitsNbt = states.traits.get(player.getUuid());

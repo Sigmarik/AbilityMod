@@ -8,11 +8,10 @@ import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.world.World;
 import net.sigmarik.abilitymod.AbilityMod;
-import net.sigmarik.abilitymod.util.TraitStates;
+import net.sigmarik.abilitymod.util.ServerState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(EnderPearlEntity.class)
 public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
@@ -25,7 +24,7 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
             target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
     )
     private boolean traitedDamage(Entity entity, DamageSource damageSource, float amount) {
-        if (TraitStates.hasTrait((PlayerEntity) entity, AbilityMod.TRAIT_EASY_PEARLS)) {
+        if (ServerState.hasTrait((PlayerEntity) entity, AbilityMod.TRAIT_EASY_PEARLS)) {
             return false;
         } else return entity.damage(damageSource, amount);
     }
