@@ -1,24 +1,26 @@
 package net.sigmarik.abilitymod.mixin;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.PotionUtil;
-import net.minecraft.potion.Potions;
-import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.LightType;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionTypes;
 import net.sigmarik.abilitymod.AbilityMod;
 import net.sigmarik.abilitymod.util.ServerState;
-import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -28,6 +30,8 @@ import java.util.function.Predicate;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
+
+    @Shadow public abstract PlayerInventory getInventory();
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -79,11 +83,35 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         }
     }
 
+    private void tickLightBurn() {
+        if (ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_DAMAGED_BY_LIGHT)) {
+            World world = this.getWorld();
+            ItemStack helmet = this.getInventory().getArmorStack(3);
+            long time = world.getTimeOfDay() % 24000;
+            int lightLevel = world.getLightLevel(LightType.SKY, this.getBlockPos());
+            if (!(lightLevel <= 11 ||
+                    !world.isSkyVisible(this.getBlockPos()) || this.isTouchingWaterOrRain() || this.isInLava() ||
+                    this.hasStatusEffect(StatusEffect.byRawId(AbilityMod.FIRE_RESISTANCE_STATUS_EFFECT)) ||
+                    this.getBlockStateAtPos().getBlock().equals(Blocks.COBWEB) || (time >= 12542 && time < 23460) ||
+                    !world.getRegistryKey().getValue().equals(DimensionTypes.OVERWORLD_ID))) {
+                if (world.random.nextInt(AbilityMod.FIRING_CHANCE_PER_TICK) == 0) {
+                    if (helmet != null && helmet.isDamageable()) {
+                        this.getInventory().damageArmor((new DamageSources(world.getRegistryManager())).inFire(),
+                                1, PlayerInventory.HELMET_SLOTS);
+                    } else {
+                        this.setOnFireFromLava();
+                    }
+                }
+            }
+        }
+    }
+
     @Inject(method = "tick", at = @At("HEAD"))
     private void traitedTick(CallbackInfo ci) {
         tickFearOfWater();
         tickAddiction();
         tickBoatMagnet();
+        tickLightBurn();
     }
 
     @Inject(method = "eatFood", at = @At("RETURN"))

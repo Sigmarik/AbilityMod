@@ -2,7 +2,6 @@ package net.sigmarik.abilitymod;
 
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.world.dimension.DimensionOptionsRegistryHolder;
 import net.sigmarik.abilitymod.command.TraitCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +31,10 @@ public class AbilityMod implements DedicatedServerModInitializer {
 	public static final int BOAT_ATTRACTION_DISTANCE = 4;
 
 	public static final double BOAT_ATTRACTION_FACTOR = 0.1;
+
+	public static final int FIRE_RESISTANCE_STATUS_EFFECT = 12;
+
+	public static final int FIRING_CHANCE_PER_TICK = 55;
 
 	public static final int ADDICTION_START_TIMER 	= 1800 * 20;	// 30 minutes
 	public static final int ADDICTION_MID_TIMER 	= 180 * 20;   	// 3 minutes
