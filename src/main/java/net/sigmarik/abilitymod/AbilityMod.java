@@ -2,10 +2,13 @@ package net.sigmarik.abilitymod;
 
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.world.dimension.DimensionOptionsRegistryHolder;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.sigmarik.abilitymod.command.TraitCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 public class AbilityMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "abilitymod";
@@ -21,7 +24,7 @@ public class AbilityMod implements DedicatedServerModInitializer {
 	public static final String TRAIT_INVERT_EFFECTS = "invert_effects";
 
 	public static final String TRAIT_BOAT_MAGNET = "boat_magnet";
-	public static final String TRAIT_CLEAN_COSTUME = "clean_costume";
+	public static final String TRAIT_DIRT_SICKNESS = "dirt_sickness";
 	public static final String TRAIT_ADDICTION = "addiction";
 
 	public static final String TRAIT_FAST = "fast";
@@ -29,13 +32,21 @@ public class AbilityMod implements DedicatedServerModInitializer {
 	public static final String TRAIT_HATED = "hated";
 	public static final String TRAIT_HOT_IRON = "hot_iron";
 
-	public static final int BOAT_ATTRACTION_DISTANCE = 4;
+	public static final int BOAT_ATTRACTION_DISTANCE = 8;
 
-	public static final double BOAT_ATTRACTION_FACTOR = 0.1;
+	public static final double BOAT_ATTRACTION_FACTOR = 0.05;
 
 	public static final int ADDICTION_START_TIMER 	= 1800 * 20;	// 30 minutes
 	public static final int ADDICTION_MID_TIMER 	= 180 * 20;   	// 3 minutes
 	public static final int ADDICTION_WARNING_TIMER = 20 * 20;
+
+	public static final Set<Block> DIRTY_BLOCKS = Set.of(
+			Blocks.DIRT, Blocks.DIRT_PATH, Blocks.MUD,
+			Blocks.MUDDY_MANGROVE_ROOTS, Blocks.FARMLAND, Blocks.MANGROVE_LEAVES,
+			Blocks.MOSS_BLOCK, Blocks.MOSS_CARPET, Blocks.NETHER_WART_BLOCK, Blocks.ICE,
+			Blocks.PODZOL, Blocks.CHORUS_FLOWER, Blocks.ROOTED_DIRT, Blocks.SCULK,
+			Blocks.WARPED_NYLIUM, Blocks.WET_SPONGE, Blocks.ZOMBIE_HEAD, Blocks.ZOMBIE_WALL_HEAD,
+			Blocks.COAL_BLOCK, Blocks.COAL_ORE, Blocks.DEEPSLATE_COAL_ORE);
 
 	@Override
 	public void onInitializeServer() {

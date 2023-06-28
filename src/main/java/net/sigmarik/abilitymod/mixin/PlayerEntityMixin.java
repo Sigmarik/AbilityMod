@@ -9,15 +9,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.PotionUtil;
-import net.minecraft.potion.Potions;
-import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeKeys;
 import net.sigmarik.abilitymod.AbilityMod;
 import net.sigmarik.abilitymod.util.ServerState;
-import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -65,17 +62,34 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                     AbilityMod.BOAT_ATTRACTION_DISTANCE,
                     AbilityMod.BOAT_ATTRACTION_DISTANCE,
                     AbilityMod.BOAT_ATTRACTION_DISTANCE);
+            Box ignoranceBox = Box.of(getPos(), 4, 4, 4);
 
             final Predicate<Entity> boatPredicate = boatEntity -> true;
 
             for (Entity entity : getEntityWorld().getEntitiesByClass(BoatEntity.class, attractionBox, boatPredicate)) {
                 if (entity.hasPassenger(this)) continue;
                 if (entity.hasVehicle()) continue;
-                if (entity.getBoundingBox().intersects(getVehicle().getBoundingBox())) continue;
+                if (entity.getBoundingBox().intersects(ignoranceBox)) continue;
 
-                entity.addVelocity(getPos().subtract(entity.getPos()).add(getVelocity())
-                       .multiply(1.0, 0.0, 1.0).multiply(AbilityMod.BOAT_ATTRACTION_FACTOR));
+                Vec3d delta = getPos().subtract(entity.getPos());
+                Vec3d direction = delta.normalize();
+                double multiplier = delta.lengthSquared() * AbilityMod.BOAT_ATTRACTION_FACTOR;
+
+                entity.addVelocity(direction.multiply(1.0, 0.0, 1.0).multiply(multiplier));
             }
+        }
+    }
+
+    private void tickDirtSickness() {
+        if (ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_DIRT_SICKNESS) &&
+                !hasVehicle() && fallDistance == 0.0) {
+            if (isTouchingWater() &&
+                    (getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.SWAMP) ||
+                    getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.MANGROVE_SWAMP) ||
+                    getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.LUSH_CAVES)))
+                addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 5 * 20));
+            if (AbilityMod.DIRTY_BLOCKS.contains(getSteppingBlockState().getBlock()))
+                addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 5 * 20));
         }
     }
 
@@ -84,6 +98,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         tickFearOfWater();
         tickAddiction();
         tickBoatMagnet();
+        tickDirtSickness();
     }
 
     @Inject(method = "eatFood", at = @At("RETURN"))
