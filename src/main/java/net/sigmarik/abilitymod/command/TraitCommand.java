@@ -74,7 +74,7 @@ public class TraitCommand {
         ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
 
         ServerState states = ServerState.getTraitStates(player.server);
-        Set<String> traits = states.getTraitList(player.getUuid()).getKeys();
+        Set<String> traits = states.getTraitList(player.getUuid());
 
         if (traits.isEmpty()) {
             player.sendMessage(Text.literal(player.getName().getString() + " has no traits."));

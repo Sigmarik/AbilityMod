@@ -22,12 +22,20 @@ public class AbilityMod implements DedicatedServerModInitializer {
 
 	public static final String TRAIT_BOAT_MAGNET = "boat_magnet";
 	public static final String TRAIT_CLEAN_COSTUME = "clean_costume";
-	public static final String TRAIT_QING = "qing";
+	public static final String TRAIT_ADDICTION = "addiction";
 
 	public static final String TRAIT_FAST = "fast";
 	public static final String TRAIT_STRONG = "strong";
 	public static final String TRAIT_HATED = "hated";
 	public static final String TRAIT_HOT_IRON = "hot_iron";
+
+	public static final int BOAT_ATTRACTION_DISTANCE = 4;
+
+	public static final double BOAT_ATTRACTION_FACTOR = 0.1;
+
+	public static final int ADDICTION_START_TIMER 	= 1800 * 20;	// 30 minutes
+	public static final int ADDICTION_MID_TIMER 	= 180 * 20;   	// 3 minutes
+	public static final int ADDICTION_WARNING_TIMER = 20 * 20;
 
 	@Override
 	public void onInitializeServer() {

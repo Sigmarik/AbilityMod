@@ -9,7 +9,8 @@
     "EndermanEntityMixin",
     "PlayerEntityMixin",
     "TargetPredicateMixin",
-    "StatusEffectMixin"
+    "StatusEffectMixin",
+    "PotionItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1
