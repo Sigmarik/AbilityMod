@@ -33,6 +33,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Shadow public abstract PlayerInventory getInventory();
 
+    @Shadow public abstract Iterable<ItemStack> getArmorItems();
+
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -106,12 +108,25 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         }
     }
 
+    private void tickIronBurn() {
+        if (ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_HOT_IRON)) {
+            boolean doDamage = false;
+            for (int i = 0; i < 41; ++i) {
+                doDamage |= AbilityMod.IRON_ITEMS.contains(this.getInventory().getStack(i).getItem());
+            }
+            if (doDamage) {
+                this.damage(new DamageSources(world.getRegistryManager()).hotFloor(), 2);
+            }
+        }
+    }
+
     @Inject(method = "tick", at = @At("HEAD"))
     private void traitedTick(CallbackInfo ci) {
         tickFearOfWater();
         tickAddiction();
         tickBoatMagnet();
         tickLightBurn();
+        tickIronBurn();
     }
 
     @Inject(method = "eatFood", at = @At("RETURN"))

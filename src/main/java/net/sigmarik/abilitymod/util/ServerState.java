@@ -118,7 +118,7 @@ public class ServerState extends PersistentState {
         if (!state.data.containsKey(player.getUuid())) state.registerPlayer(player.getUuid());
 
         if (state.data.get(player.getUuid()).addictionTimer > 0)
-        --state.data.get(player.getUuid()).addictionTimer;
+            --state.data.get(player.getUuid()).addictionTimer;
     }
 
     public static void setAddictionTimer(PlayerEntity player, int newAddictionTimer) {
