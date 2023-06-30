@@ -35,80 +35,83 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         super(entityType, world);
     }
 
+    private boolean hasTrait(String trait) {
+        return ServerState.hasTrait((PlayerEntity)(Object)this, trait);
+    }
+
     private void tickFearOfWater() {
-        if (ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_FEAR_OF_WATER) && isWet()) {
-            damage(getDamageSources().magic(), 3);
-        }
+        if (!hasTrait(AbilityMod.TRAIT_FEAR_OF_WATER) || !isWet()) return;
+
+        damage(getDamageSources().magic(), 3);
     }
 
     private void tickAddiction() {
-        if (ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_ADDICTION)) {
-            ServerState.tickAddictionTimer((PlayerEntity)(Object)this);
+        if (!hasTrait(AbilityMod.TRAIT_ADDICTION)) return;
 
-            int timer = ServerState.getAddictionTimer((PlayerEntity)(Object)this);
+        ServerState.tickAddictionTimer((PlayerEntity)(Object)this);
 
-            if (timer < AbilityMod.ADDICTION_WARNING_TIMER) {
-                addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, timer));
-            }
-            if (timer == 0) {
-                addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 20));
-                addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 20));
-                addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 20));
-                addStatusEffect(new StatusEffectInstance(StatusEffects.DARKNESS, 20));
-                addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 20));
-            }
+        int timer = ServerState.getAddictionTimer((PlayerEntity)(Object)this);
+
+        if (timer < AbilityMod.ADDICTION_WARNING_TIMER) {
+            addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, timer));
+        }
+        if (timer == 0) {
+            addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 20));
+            addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 20));
+            addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 20));
+            addStatusEffect(new StatusEffectInstance(StatusEffects.DARKNESS, 20));
+            addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 20));
         }
     }
 
     private void tickBoatMagnet() {
-        if (ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_BOAT_MAGNET) && hasVehicle() &&
-                (getVehicle().getType() == EntityType.BOAT || getVehicle().getType() == EntityType.CHEST_BOAT)) {
-            Box attractionBox = Box.of(getPos(),
-                    AbilityMod.BOAT_ATTRACTION_DISTANCE,
-                    AbilityMod.BOAT_ATTRACTION_DISTANCE,
-                    AbilityMod.BOAT_ATTRACTION_DISTANCE);
-            Box ignoranceBox = Box.of(getPos(), 4, 4, 4);
+        if (!hasTrait(AbilityMod.TRAIT_BOAT_MAGNET)) return;
+        if (!hasVehicle() || !(getVehicle() instanceof BoatEntity)) return;
 
-            final Predicate<Entity> boatPredicate = boatEntity -> true;
+        Box attractionBox = Box.of(getPos(),
+                AbilityMod.BOAT_ATTRACTION_DISTANCE,
+                AbilityMod.BOAT_ATTRACTION_DISTANCE,
+                AbilityMod.BOAT_ATTRACTION_DISTANCE);
+        Box ignoranceBox = Box.of(getPos(), 4, 4, 4);
 
-            for (Entity entity : getEntityWorld().getEntitiesByClass(BoatEntity.class, attractionBox, boatPredicate)) {
-                if (entity.hasPassenger(this)) continue;
-                if (entity.hasVehicle()) continue;
-                if (entity.getBoundingBox().intersects(ignoranceBox)) continue;
+        final Predicate<Entity> boatPredicate = boatEntity -> true;
 
-                Vec3d delta = getPos().subtract(entity.getPos());
-                Vec3d direction = delta.normalize();
-                double multiplier = delta.lengthSquared() * AbilityMod.BOAT_ATTRACTION_FACTOR;
+        for (Entity entity : getEntityWorld().getEntitiesByClass(BoatEntity.class, attractionBox, boatPredicate)) {
+            if (entity.hasPassenger(this)) continue;
+            if (entity.hasVehicle()) continue;
+            if (entity.getBoundingBox().intersects(ignoranceBox)) continue;
 
-                entity.addVelocity(direction.multiply(1.0, 0.0, 1.0).multiply(multiplier));
-            }
+            Vec3d delta = getPos().subtract(entity.getPos());
+            Vec3d direction = delta.normalize();
+            double multiplier = delta.lengthSquared() * AbilityMod.BOAT_ATTRACTION_FACTOR;
+
+            entity.addVelocity(direction.multiply(1.0, 0.0, 1.0).multiply(multiplier));
         }
     }
 
     private void tickDirtSickness() {
-        if (ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_DIRT_SICKNESS) &&
-                !hasVehicle() && fallDistance == 0.0) {
-            if (isTouchingWater() &&
-                    (getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.SWAMP) ||
-                    getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.MANGROVE_SWAMP) ||
-                    getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.LUSH_CAVES)))
-                addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 5 * 20));
-            if (AbilityMod.DIRTY_BLOCKS.contains(getSteppingBlockState().getBlock()))
-                addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 5 * 20));
-        }
+        if (!hasTrait(AbilityMod.TRAIT_DIRT_SICKNESS) || hasVehicle() || fallDistance > 0.0) return;
+
+        if (isTouchingWater() &&
+                (getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.SWAMP) ||
+                getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.MANGROVE_SWAMP) ||
+                getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.LUSH_CAVES)))
+            addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 5 * 20));
+        if (AbilityMod.DIRTY_BLOCKS.contains(getSteppingBlockState().getBlock()))
+            addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 5 * 20));
     }
 
     private void tickHated() {
-        if (ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_HATED)) {
-            Box aggroBox = Box.of(getPos(), 20, 10, 20);
+        if (!hasTrait(AbilityMod.TRAIT_HATED)) return;
 
-            Predicate<LivingEntity> aggroPredicate = entity -> true;
+        Box aggroBox = Box.of(getPos(), 20, 10, 20);
 
-            for (LivingEntity entity : getEntityWorld().getEntitiesByClass(LivingEntity.class, aggroBox, aggroPredicate)) {
-                if (!(entity instanceof Angerable)) continue;
+        Predicate<LivingEntity> aggroPredicate = entity -> true;
 
-                ((Angerable) entity).setAngryAt(getUuid());
-            }
+        for (LivingEntity entity : getEntityWorld().getEntitiesByClass(LivingEntity.class, aggroBox, aggroPredicate)) {
+            if (!(entity instanceof Angerable)) continue;
+
+            ((Angerable) entity).setAngryAt(getUuid());
         }
     }
 
@@ -123,9 +126,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Inject(method = "eatFood", at = @At("RETURN"))
     private void traitedEatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        if (stack.getItem().equals(Items.ROTTEN_FLESH) &&
-                ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_HARMFUL_ROTTEN_FLESH)) {
-            if (ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_INVERT_EFFECTS)) {
+        if (stack.getItem().equals(Items.ROTTEN_FLESH) && hasTrait(AbilityMod.TRAIT_HARMFUL_ROTTEN_FLESH)) {
+            if (hasTrait(AbilityMod.TRAIT_INVERT_EFFECTS)) {
                 addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 30 * 20));
             } else {
                 addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 30 * 20));
