@@ -11,6 +11,8 @@ import java.util.*;
 
 public class ServerState extends PersistentState {
     public static class PlayerData {
+        UUID fastUUID;
+        UUID strongUUID;
         Set<String> traits = new HashSet<>(Collections.emptySet());
         int addictionTimer = AbilityMod.ADDICTION_START_TIMER;
     }
@@ -34,6 +36,14 @@ public class ServerState extends PersistentState {
 
             cell.putInt("addiction_timer", data.get(playerUUID).addictionTimer);
 
+            if (data.get(playerUUID).fastUUID != null) {
+                cell.putUuid("fastUUID", data.get(playerUUID).fastUUID);
+            }
+
+            if (data.get(playerUUID).strongUUID != null) {
+                cell.putUuid("strongUUID", data.get(playerUUID).strongUUID);
+            }
+
             storage.put(String.valueOf(playerUUID), cell);
         }
 
@@ -52,6 +62,12 @@ public class ServerState extends PersistentState {
 
             playerData.traits.addAll(playerNbt.getCompound("traits").getKeys());
             playerData.addictionTimer = playerNbt.getInt("addiction_timer");
+            if (playerNbt.contains("fastUUID")) {
+                playerData.fastUUID = playerNbt.getUuid("fastUUID");
+            }
+            if (playerNbt.contains("strongUUID")) {
+                playerData.strongUUID = playerNbt.getUuid("strongUUID");
+            }
         }
 
         return state;
@@ -129,5 +145,69 @@ public class ServerState extends PersistentState {
         if (!state.data.containsKey(player.getUuid())) state.registerPlayer(player.getUuid());
 
         state.data.get(player.getUuid()).addictionTimer = newAddictionTimer;
+    }
+
+    public static UUID getFastUUID(PlayerEntity player) {
+        if (player.getServer() == null) {
+            return null;
+        }
+
+        ServerState state = getTraitStates(player.getServer());
+
+        if (!state.data.containsKey(player.getUuid())) {
+            state.registerPlayer(player.getUuid());
+        }
+
+        if (state.data.get(player.getUuid()).fastUUID == null) {
+            setFastUUID(player, UUID.randomUUID());
+        }
+
+        return state.data.get(player.getUuid()).fastUUID;
+    }
+
+    public static void setFastUUID(PlayerEntity player, UUID modifierUUID) {
+        if (player.getServer() == null) {
+            return;
+        }
+
+        ServerState state = getTraitStates(player.getServer());
+
+        if (!state.data.containsKey(player.getUuid())) {
+            state.registerPlayer(player.getUuid());
+        }
+
+        state.data.get(player.getUuid()).fastUUID = modifierUUID;
+    }
+
+    public static UUID getStrongUUID(PlayerEntity player) {
+        if (player.getServer() == null) {
+            return null;
+        }
+
+        ServerState state = getTraitStates(player.getServer());
+
+        if (!state.data.containsKey(player.getUuid())) {
+            state.registerPlayer(player.getUuid());
+        }
+
+        if (state.data.get(player.getUuid()).strongUUID == null) {
+            setStrongUUID(player, UUID.randomUUID());
+        }
+
+        return state.data.get(player.getUuid()).strongUUID;
+    }
+
+    public static void setStrongUUID(PlayerEntity player, UUID modifierUUID) {
+        if (player.getServer() == null) {
+            return;
+        }
+
+        ServerState state = getTraitStates(player.getServer());
+
+        if (!state.data.containsKey(player.getUuid())) {
+            state.registerPlayer(player.getUuid());
+        }
+
+        state.data.get(player.getUuid()).strongUUID = modifierUUID;
     }
 }

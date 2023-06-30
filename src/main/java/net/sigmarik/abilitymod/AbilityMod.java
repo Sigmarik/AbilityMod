@@ -2,17 +2,14 @@ package net.sigmarik.abilitymod;
 
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.util.math.random.Random;
 import net.sigmarik.abilitymod.command.TraitCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 
 public class AbilityMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "abilitymod";
@@ -40,9 +37,7 @@ public class AbilityMod implements DedicatedServerModInitializer {
 
 	public static final double BOAT_ATTRACTION_FACTOR = 0.1;
 
-	public static final int FIRE_RESISTANCE_STATUS_EFFECT = 12;
-
-	public static final int FIRING_CHANCE_PER_TICK = 55;
+	public static final int DAYLIGHT_BURNING_CHANCE_PER_TICK = 55;
 
 	public static final int ADDICTION_START_TIMER 	= 1800 * 20;	// 30 minutes
 	public static final int ADDICTION_MID_TIMER 	= 180 * 20;   	// 3 minutes
@@ -109,28 +104,9 @@ public class AbilityMod implements DedicatedServerModInitializer {
 			Items.WATER_BUCKET
 	));
 
-	public static final HashSet<EntityType> NEUTRAL_MOBS = new HashSet<>(List.of(
-			EntityType.BEE,
-			EntityType.CAVE_SPIDER,
-			EntityType.DOLPHIN,
-			EntityType.ENDERMAN,
-			EntityType.GOAT,
-			EntityType.IRON_GOLEM,
-			EntityType.LLAMA,
-			EntityType.PANDA,
-			EntityType.PIGLIN,
-			EntityType.POLAR_BEAR,
-			EntityType.SPIDER,
-			EntityType.WOLF,
-			EntityType.ZOMBIFIED_PIGLIN,
-			EntityType.TRADER_LLAMA
-	));
+	public static final double MOVEMENT_SPEED_BASE_MULTIPLY_COEFFICIENT = 0.3;
 
-	public static final double FAST_COEFFICIENT = 0.3;
-	public static final UUID FAST_MODIFIER_UUID = new UUID(Random.createLocal().nextLong(), Random.createLocal().nextLong());
-
-	public static final double STRONG_COEFFICIENT = 0.3;
-	public static final UUID STRONG_MODIFIER_UUID = new UUID(Random.createLocal().nextLong(), Random.createLocal().nextLong());
+	public static final double ATTACK_DAMAGE_BASE_MULTIPLY_COEFFICIENT = 0.3;
 
 
 	@Override

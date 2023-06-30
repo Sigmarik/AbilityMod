@@ -4,8 +4,10 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -17,22 +19,26 @@ import net.sigmarik.abilitymod.util.ServerState;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import static net.minecraft.server.command.CommandManager.*;
 
 public class TraitCommand {
+    private static final TraitsSuggestionProvider traitSuggestor = new TraitsSuggestionProvider();
+
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
                 literal("trait").requires(source -> source.hasPermissionLevel(2))
                 .then(literal("add")
                         .then(argument("players", EntityArgumentType.players())
                         .then(argument("trait", StringArgumentType.greedyString())
-                                .suggests(SuggestionProviders.ALL_RECIPES)
-                        .executes(TraitCommand::addTrait))))
+                                .suggests(traitSuggestor)
+                                        .executes(TraitCommand::addTrait))))
                 .then(literal("remove")
                         .then(argument("players", EntityArgumentType.players())
                         .then(argument("trait", StringArgumentType.greedyString())
-                                .executes(TraitCommand::removeTrait))))
+                                .suggests(traitSuggestor)
+                                        .executes(TraitCommand::removeTrait))))
                 .then(literal("list")
                         .then(argument("player", EntityArgumentType.player())
                                 .executes(TraitCommand::printTraits)))
@@ -53,14 +59,18 @@ public class TraitCommand {
 
                 if (trait.equals(AbilityMod.TRAIT_FAST)) {
                     EntityAttributeInstance speed = player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-                    EntityAttributeModifier speedModifier = new EntityAttributeModifier(AbilityMod.FAST_MODIFIER_UUID, "Fast", AbilityMod.FAST_COEFFICIENT, EntityAttributeModifier.Operation.MULTIPLY_BASE);
+                    EntityAttributeModifier speedModifier = new EntityAttributeModifier(ServerState.getFastUUID(player),
+                            "Fast", AbilityMod.MOVEMENT_SPEED_BASE_MULTIPLY_COEFFICIENT,
+                            EntityAttributeModifier.Operation.MULTIPLY_BASE);
                     if (!speed.hasModifier(speedModifier)) {
                         speed.addPersistentModifier(speedModifier);
                     }
                 }
                 if (trait.equals(AbilityMod.TRAIT_STRONG)) {
                     EntityAttributeInstance strength = player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
-                    EntityAttributeModifier strengthModifier = new EntityAttributeModifier(AbilityMod.STRONG_MODIFIER_UUID, "Strong", AbilityMod.STRONG_COEFFICIENT, EntityAttributeModifier.Operation.MULTIPLY_BASE);
+                    EntityAttributeModifier strengthModifier = new EntityAttributeModifier(ServerState.getStrongUUID(player),
+                            "Strong", AbilityMod.ATTACK_DAMAGE_BASE_MULTIPLY_COEFFICIENT,
+                            EntityAttributeModifier.Operation.MULTIPLY_BASE);
                     if (!strength.hasModifier(strengthModifier)) {
                         strength.addPersistentModifier(strengthModifier);
                     }
@@ -98,16 +108,20 @@ public class TraitCommand {
 
                 if (trait.equals(AbilityMod.TRAIT_FAST)) {
                     EntityAttributeInstance speed = player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-                    EntityAttributeModifier speedModifier = new EntityAttributeModifier(AbilityMod.FAST_MODIFIER_UUID, "Fast", AbilityMod.FAST_COEFFICIENT, EntityAttributeModifier.Operation.MULTIPLY_BASE);
+                    EntityAttributeModifier speedModifier = new EntityAttributeModifier(ServerState.getFastUUID(player),
+                            "Fast", AbilityMod.MOVEMENT_SPEED_BASE_MULTIPLY_COEFFICIENT,
+                            EntityAttributeModifier.Operation.MULTIPLY_BASE);
                     if (speed.hasModifier(speedModifier)) {
-                        speed.removeModifier(AbilityMod.FAST_MODIFIER_UUID);
+                        speed.removeModifier(ServerState.getFastUUID(player));
                     }
                 }
                 if (trait.equals(AbilityMod.TRAIT_STRONG)) {
                     EntityAttributeInstance strength = player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
-                    EntityAttributeModifier strengthModifier = new EntityAttributeModifier(AbilityMod.STRONG_MODIFIER_UUID, "Strong", AbilityMod.STRONG_COEFFICIENT, EntityAttributeModifier.Operation.MULTIPLY_BASE);
+                    EntityAttributeModifier strengthModifier = new EntityAttributeModifier(ServerState.getStrongUUID(player),
+                            "Strong", AbilityMod.ATTACK_DAMAGE_BASE_MULTIPLY_COEFFICIENT,
+                            EntityAttributeModifier.Operation.MULTIPLY_BASE);
                     if (strength.hasModifier(strengthModifier)) {
-                        strength.removeModifier(AbilityMod.STRONG_MODIFIER_UUID);
+                        strength.removeModifier(ServerState.getStrongUUID(player));
                     }
                 }
             }
@@ -134,5 +148,31 @@ public class TraitCommand {
         }
 
         return 1;
+    }
+
+    private static class TraitsSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            builder.suggest(AbilityMod.TRAIT_EASY_PEARLS);
+            builder.suggest(AbilityMod.TRAIT_NO_EYE_AGGRO);
+            builder.suggest(AbilityMod.TRAIT_FEAR_OF_WATER);
+            builder.suggest(AbilityMod.TRAIT_IGNORED_BY_UNDEAD);
+            builder.suggest(AbilityMod.TRAIT_DAMAGED_BY_LIGHT);
+            builder.suggest(AbilityMod.TRAIT_HARMFUL_ROTTEN_FLESH);
+            builder.suggest(AbilityMod.TRAIT_INVERT_EFFECTS);
+            builder.suggest(AbilityMod.TRAIT_BOAT_MAGNET);
+            builder.suggest(AbilityMod.TRAIT_CLEAN_COSTUME);
+            builder.suggest(AbilityMod.TRAIT_ADDICTION);
+            builder.suggest(AbilityMod.TRAIT_FAST);
+            builder.suggest(AbilityMod.TRAIT_STRONG);
+            builder.suggest(AbilityMod.TRAIT_HATED);
+            builder.suggest(AbilityMod.TRAIT_HOT_IRON);
+
+            if(context.getNodes().get(1).getNode().getUsageText().equals("remove")) {
+                builder.suggest("*");
+            }
+
+            return builder.buildFuture();
+        }
     }
 }
