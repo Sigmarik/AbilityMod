@@ -5,7 +5,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -16,6 +18,7 @@ import net.minecraft.world.biome.BiomeKeys;
 import net.sigmarik.abilitymod.AbilityMod;
 import net.sigmarik.abilitymod.util.ServerState;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -25,6 +28,8 @@ import java.util.function.Predicate;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
+
+    @Shadow public abstract PlayerInventory getInventory();
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -93,12 +98,27 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         }
     }
 
+    private void tickHated() {
+        if (ServerState.hasTrait((PlayerEntity)(Object)this, AbilityMod.TRAIT_HATED)) {
+            Box aggroBox = Box.of(getPos(), 20, 10, 20);
+
+            Predicate<LivingEntity> aggroPredicate = entity -> true;
+
+            for (LivingEntity entity : getEntityWorld().getEntitiesByClass(LivingEntity.class, aggroBox, aggroPredicate)) {
+                if (!(entity instanceof Angerable)) continue;
+
+                ((Angerable) entity).setAngryAt(getUuid());
+            }
+        }
+    }
+
     @Inject(method = "tick", at = @At("HEAD"))
     private void traitedTick(CallbackInfo ci) {
         tickFearOfWater();
         tickAddiction();
         tickBoatMagnet();
         tickDirtSickness();
+        tickHated();
     }
 
     @Inject(method = "eatFood", at = @At("RETURN"))
