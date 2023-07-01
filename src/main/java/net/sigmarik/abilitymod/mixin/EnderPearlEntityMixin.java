@@ -24,7 +24,7 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
             target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
     )
     private boolean traitedDamage(Entity entity, DamageSource damageSource, float amount) {
-        if (ServerState.hasTrait((PlayerEntity) entity, Traits.TRAIT_EASY_PEARLS)) {
+        if (ServerState.hasTrait((PlayerEntity) entity, Traits.EASY_PEARLS)) {
             return false;
         } else return entity.damage(damageSource, amount);
     }
