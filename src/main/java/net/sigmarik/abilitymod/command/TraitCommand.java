@@ -22,7 +22,7 @@ public class TraitCommand {
                 literal("trait").requires(source -> source.hasPermissionLevel(2))
                 .then(literal("add")
                         .then(argument("players", EntityArgumentType.players())
-                        .then(argument("trait", StringArgumentType.word()).suggests(SuggestionProviders.ALL_RECIPES)
+                        .then(argument("trait", StringArgumentType.word())
                         .executes(TraitCommand::addTrait))))
                 .then(literal("remove")
                         .then(argument("players", EntityArgumentType.players())
