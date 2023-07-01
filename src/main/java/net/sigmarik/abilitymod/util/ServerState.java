@@ -12,7 +12,7 @@ import java.util.*;
 public class ServerState extends PersistentState {
     public static class PlayerData {
         Set<String> traits = new HashSet<>(Collections.emptySet());
-        int addictionTimer = AbilityMod.ADDICTION_START_TIMER;
+        int addictionTimer = Settings.ADDICTION_START_TIMER;
     }
 
     public HashMap<UUID, PlayerData> data = new HashMap<>();
@@ -101,7 +101,7 @@ public class ServerState extends PersistentState {
     }
 
     public static int getAddictionTimer(PlayerEntity player) {
-        if (player.getServer() == null) return AbilityMod.ADDICTION_START_TIMER;
+        if (player.getServer() == null) return Settings.ADDICTION_START_TIMER;
 
         ServerState state = getTraitStates(player.getServer());
 

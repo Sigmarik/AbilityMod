@@ -18,14 +18,14 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeKeys;
-import net.sigmarik.abilitymod.AbilityMod;
 import net.sigmarik.abilitymod.util.PropSets;
 import net.sigmarik.abilitymod.util.ServerState;
+import net.sigmarik.abilitymod.util.Settings;
+import net.sigmarik.abilitymod.util.Traits;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -46,19 +46,19 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickFearOfWater() {
-        if (!hasTrait(AbilityMod.TRAIT_FEAR_OF_WATER) || !isWet()) return;
+        if (!hasTrait(Traits.TRAIT_FEAR_OF_WATER) || !isWet()) return;
 
         damage(getDamageSources().magic(), 3);
     }
 
     private void tickAddiction() {
-        if (!hasTrait(AbilityMod.TRAIT_ADDICTION)) return;
+        if (!hasTrait(Traits.TRAIT_ADDICTION)) return;
 
         ServerState.tickAddictionTimer((PlayerEntity)(Object)this);
 
         int timer = ServerState.getAddictionTimer((PlayerEntity)(Object)this);
 
-        if (timer < AbilityMod.ADDICTION_WARNING_TIMER) {
+        if (timer < Settings.ADDICTION_WARNING_TIMER) {
             addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, timer));
         }
         if (timer == 0) {
@@ -71,13 +71,10 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickBoatMagnet() {
-        if (!hasTrait(AbilityMod.TRAIT_BOAT_MAGNET)) return;
+        if (!hasTrait(Traits.TRAIT_BOAT_MAGNET)) return;
         if (!hasVehicle() || !(getVehicle() instanceof BoatEntity)) return;
 
-        Box attractionBox = Box.of(getPos(),
-                AbilityMod.BOAT_ATTRACTION_DISTANCE,
-                AbilityMod.BOAT_ATTRACTION_DISTANCE,
-                AbilityMod.BOAT_ATTRACTION_DISTANCE);
+        Box attractionBox = Box.of(getPos(), 8, 8, 8);
         Box ignoranceBox = Box.of(getPos(), 4, 4, 4);
 
         final Predicate<Entity> boatPredicate = boatEntity -> true;
@@ -89,14 +86,14 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
             Vec3d delta = getPos().subtract(entity.getPos());
             Vec3d direction = delta.normalize();
-            double multiplier = delta.lengthSquared() * AbilityMod.BOAT_ATTRACTION_FACTOR;
+            double multiplier = delta.lengthSquared() * 0.05;
 
             entity.addVelocity(direction.multiply(1.0, 0.0, 1.0).multiply(multiplier));
         }
     }
 
     private void tickDirtSickness() {
-        if (!hasTrait(AbilityMod.TRAIT_DIRT_SICKNESS) || hasVehicle() || fallDistance > 0.0) return;
+        if (!hasTrait(Traits.TRAIT_DIRT_SICKNESS) || hasVehicle() || fallDistance > 0.0) return;
 
         if (isTouchingWater() &&
                 (getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.SWAMP) ||
@@ -108,7 +105,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickHated() {
-        if (!hasTrait(AbilityMod.TRAIT_HATED)) return;
+        if (!hasTrait(Traits.TRAIT_HATED)) return;
 
         Box aggroBox = Box.of(getPos(), 20, 10, 20);
 
@@ -122,23 +119,23 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickFast() {
-        if (hasTrait(AbilityMod.TRAIT_FAST)) {
+        if (hasTrait(Traits.TRAIT_FAST)) {
             Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.15);
-        } else {  //                             PlayerEntity::createPlayerAttributes --v
+        } else {  //                                                     PlayerEntity::createPlayerAttributes --v
             Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.1);
         }
     }
 
     private void tickStrong() {
-        if (hasTrait(AbilityMod.TRAIT_STRONG)) {
+        if (hasTrait(Traits.TRAIT_STRONG)) {
             Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)).setBaseValue(1.5);
-        } else {  //                            PlayerEntity::createPlayerAttributes --v
+        } else {  //                                                    PlayerEntity::createPlayerAttributes --v
             Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)).setBaseValue(1.0);
         }
     }
 
     private void tickHotIron() {
-        if (!hasTrait(AbilityMod.TRAIT_HOT_IRON)) return;
+        if (!hasTrait(Traits.TRAIT_HOT_IRON)) return;
 
         if (getInventory().containsAny(PropSets.IRON_ITEMS)) setOnFireFor(3);
     }
@@ -159,7 +156,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     // Adapted version of ZombieEntity::tickMovement
     private void tickDamagedByLight() {
-        if (!hasTrait(AbilityMod.TRAIT_DAMAGED_BY_LIGHT)) return;
+        if (!hasTrait(Traits.TRAIT_DAMAGED_BY_LIGHT)) return;
         if (!isAffectedByDaylight()) return;
 
         ItemStack helmet = this.getEquippedStack(EquipmentSlot.HEAD);
@@ -192,8 +189,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Inject(method = "eatFood", at = @At("RETURN"))
     private void traitedEatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        if (stack.getItem().equals(Items.ROTTEN_FLESH) && hasTrait(AbilityMod.TRAIT_HARMFUL_ROTTEN_FLESH)) {
-            if (hasTrait(AbilityMod.TRAIT_INVERT_EFFECTS)) {
+        if (stack.getItem().equals(Items.ROTTEN_FLESH) && hasTrait(Traits.TRAIT_HARMFUL_ROTTEN_FLESH)) {
+            if (hasTrait(Traits.TRAIT_INVERT_EFFECTS)) {
                 addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 30 * 20));
             } else {
                 addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 30 * 20));

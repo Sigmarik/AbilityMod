@@ -8,8 +8,8 @@ import net.minecraft.item.PotionItem;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.world.World;
-import net.sigmarik.abilitymod.AbilityMod;
 import net.sigmarik.abilitymod.util.ServerState;
+import net.sigmarik.abilitymod.util.Traits;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,9 +25,9 @@ public abstract class PotionItemMixin extends Item {
     @Inject(method = "finishUsing", at = @At("HEAD"))
     private void traitedFinishUsing(ItemStack stack, World world, LivingEntity user, CallbackInfoReturnable<ItemStack> cir) {
         if (user instanceof PlayerEntity && PotionUtil.getPotion(stack) == Potions.THICK &&
-                ServerState.hasTrait((PlayerEntity)user, AbilityMod.TRAIT_ADDICTION) &&
-                ServerState.getAddictionTimer((PlayerEntity)user) < AbilityMod.ADDICTION_MID_TIMER) {
-            ServerState.setAddictionTimer((PlayerEntity)user, AbilityMod.ADDICTION_MID_TIMER);
+                ServerState.hasTrait((PlayerEntity)user, Traits.TRAIT_ADDICTION) &&
+                ServerState.getAddictionTimer((PlayerEntity)user) < net.sigmarik.abilitymod.util.Settings.ADDICTION_MID_TIMER) {
+            ServerState.setAddictionTimer((PlayerEntity)user, net.sigmarik.abilitymod.util.Settings.ADDICTION_MID_TIMER);
         }
     }
 }

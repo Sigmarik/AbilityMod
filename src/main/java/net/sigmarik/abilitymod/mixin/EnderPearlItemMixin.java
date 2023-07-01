@@ -8,8 +8,8 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
-import net.sigmarik.abilitymod.AbilityMod;
 import net.sigmarik.abilitymod.util.ServerState;
+import net.sigmarik.abilitymod.util.Traits;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,7 +28,7 @@ public abstract class EnderPearlItemMixin extends Item {
             shift = At.Shift.AFTER
     ))
     private void traiedSetDelay(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
-        if (ServerState.hasTrait(user, AbilityMod.TRAIT_EASY_PEARLS)) {
+        if (ServerState.hasTrait(user, Traits.TRAIT_EASY_PEARLS)) {
             user.getItemCooldownManager().set(Items.ENDER_PEARL, 0);
         }
     }
