@@ -40,14 +40,6 @@ public class AbilityMod implements DedicatedServerModInitializer {
 	public static final int ADDICTION_MID_TIMER 	= 180 * 20;   	// 3 minutes
 	public static final int ADDICTION_WARNING_TIMER = 20 * 20;
 
-	public static final Set<Block> DIRTY_BLOCKS = Set.of(
-			Blocks.DIRT, Blocks.DIRT_PATH, Blocks.MUD,
-			Blocks.MUDDY_MANGROVE_ROOTS, Blocks.FARMLAND, Blocks.MANGROVE_LEAVES,
-			Blocks.MOSS_BLOCK, Blocks.MOSS_CARPET, Blocks.NETHER_WART_BLOCK, Blocks.ICE,
-			Blocks.PODZOL, Blocks.CHORUS_FLOWER, Blocks.ROOTED_DIRT, Blocks.SCULK,
-			Blocks.WARPED_NYLIUM, Blocks.WET_SPONGE, Blocks.ZOMBIE_HEAD, Blocks.ZOMBIE_WALL_HEAD,
-			Blocks.COAL_BLOCK, Blocks.COAL_ORE, Blocks.DEEPSLATE_COAL_ORE);
-
 	@Override
 	public void onInitializeServer() {
 		LOGGER.info("Initializing AbilityMod.");
