@@ -2,8 +2,10 @@ package net.sigmarik.abilitymod.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -17,15 +19,19 @@ import static net.minecraft.server.command.CommandManager.*;
 
 public class TraitCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        TraitSuggestion traitSuggestionProvider = new TraitSuggestion();
+
+        CommandNode<ServerCommandSource> root = dispatcher.register(literal("trait"));
+
         dispatcher.register(
                 literal("trait").requires(source -> source.hasPermissionLevel(2))
                 .then(literal("add")
                         .then(argument("players", EntityArgumentType.players())
-                        .then(argument("trait", StringArgumentType.word())
+                        .then(argument("trait", StringArgumentType.word()).suggests(traitSuggestionProvider)
                         .executes(TraitCommand::addTrait))))
                 .then(literal("remove")
                         .then(argument("players", EntityArgumentType.players())
-                        .then(argument("trait", StringArgumentType.word())
+                        .then(argument("trait", StringArgumentType.word()).suggests(traitSuggestionProvider)
                                 .executes(TraitCommand::removeTrait))))
                 .then(literal("list")
                         .then(argument("player", EntityArgumentType.player())
@@ -59,9 +65,15 @@ public class TraitCommand {
         ServerState states = ServerState.getTraitStates(context.getSource().getServer());
 
         for (ServerPlayerEntity player : players) {
-            AbilityMod.LOGGER.info("Removing trait " + trait + " from player " + player.getName().getString());
+            if (trait.equals("all")) {
+                AbilityMod.LOGGER.info("Removing all traits from player " + player.getName().getString());
 
-            states.removeTrait(player.getUuid(), trait);
+                states.clearTraits(player.getUuid());
+            } else {
+                AbilityMod.LOGGER.info("Removing trait " + trait + " from player " + player.getName().getString());
+
+                states.removeTrait(player.getUuid(), trait);
+            }
         }
 
         states.markDirty();
