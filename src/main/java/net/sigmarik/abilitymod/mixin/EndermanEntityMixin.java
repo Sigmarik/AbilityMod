@@ -22,6 +22,6 @@ public abstract class EndermanEntityMixin extends HostileEntity implements Anger
 
     @Inject(method = "isPlayerStaring", at = @At("HEAD"), cancellable = true)
     private void traitedIsStaring(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
-        if (ServerState.hasTrait(player, Traits.TRAIT_NO_EYE_AGGRO)) cir.setReturnValue(false);
+        if (ServerState.hasTrait(player, Traits.NO_EYE_AGGRO)) cir.setReturnValue(false);
     }
 }

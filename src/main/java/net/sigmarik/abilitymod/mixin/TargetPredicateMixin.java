@@ -18,7 +18,7 @@ public abstract class TargetPredicateMixin {
         if (baseEntity == null) return;
         if (baseEntity.isUndead() &&
                 targetEntity instanceof PlayerEntity &&
-                ServerState.hasTrait((PlayerEntity)targetEntity, Traits.TRAIT_IGNORED_BY_UNDEAD) &&
+                ServerState.hasTrait((PlayerEntity)targetEntity, Traits.IGNORED_BY_UNDEAD) &&
                 baseEntity.getAttacker() != targetEntity) {
             cir.setReturnValue(false);
         }

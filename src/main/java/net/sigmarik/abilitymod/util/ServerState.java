@@ -85,6 +85,12 @@ public class ServerState extends PersistentState {
         data.get(playerId).traits.remove(trait);
     }
 
+    public void clearTraits(UUID playerId) {
+        if (!data.containsKey(playerId)) return;
+
+        data.get(playerId).traits.clear();
+    }
+
     public static ServerState getTraitStates(MinecraftServer server) {
         PersistentStateManager manager = server.getOverworld().getPersistentStateManager();
 

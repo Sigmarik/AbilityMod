@@ -25,7 +25,7 @@ public abstract class PotionItemMixin extends Item {
     @Inject(method = "finishUsing", at = @At("HEAD"))
     private void traitedFinishUsing(ItemStack stack, World world, LivingEntity user, CallbackInfoReturnable<ItemStack> cir) {
         if (user instanceof PlayerEntity && PotionUtil.getPotion(stack) == Potions.THICK &&
-                ServerState.hasTrait((PlayerEntity)user, Traits.TRAIT_ADDICTION) &&
+                ServerState.hasTrait((PlayerEntity)user, Traits.ADDICTION) &&
                 ServerState.getAddictionTimer((PlayerEntity)user) < net.sigmarik.abilitymod.util.Settings.ADDICTION_MID_TIMER) {
             ServerState.setAddictionTimer((PlayerEntity)user, net.sigmarik.abilitymod.util.Settings.ADDICTION_MID_TIMER);
         }

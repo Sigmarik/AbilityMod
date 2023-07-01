@@ -46,13 +46,13 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickFearOfWater() {
-        if (!hasTrait(Traits.TRAIT_FEAR_OF_WATER) || !isWet()) return;
+        if (!hasTrait(Traits.FEAR_OF_WATER) || !isWet()) return;
 
         damage(getDamageSources().magic(), 3);
     }
 
     private void tickAddiction() {
-        if (!hasTrait(Traits.TRAIT_ADDICTION)) return;
+        if (!hasTrait(Traits.ADDICTION)) return;
 
         ServerState.tickAddictionTimer((PlayerEntity)(Object)this);
 
@@ -71,7 +71,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickBoatMagnet() {
-        if (!hasTrait(Traits.TRAIT_BOAT_MAGNET)) return;
+        if (!hasTrait(Traits.BOAT_MAGNET)) return;
         if (!hasVehicle() || !(getVehicle() instanceof BoatEntity)) return;
 
         Box attractionBox = Box.of(getPos(), 8, 8, 8);
@@ -93,7 +93,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickDirtSickness() {
-        if (!hasTrait(Traits.TRAIT_DIRT_SICKNESS) || hasVehicle() || fallDistance > 0.0) return;
+        if (!hasTrait(Traits.DIRT_SICKNESS) || hasVehicle() || fallDistance > 0.0) return;
 
         if (isTouchingWater() &&
                 (getWorld().getBiome(getBlockPos()).matchesKey(BiomeKeys.SWAMP) ||
@@ -105,7 +105,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickHated() {
-        if (!hasTrait(Traits.TRAIT_HATED)) return;
+        if (!hasTrait(Traits.HATED)) return;
 
         Box aggroBox = Box.of(getPos(), 20, 10, 20);
 
@@ -119,7 +119,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickFast() {
-        if (hasTrait(Traits.TRAIT_FAST)) {
+        if (hasTrait(Traits.FAST)) {
             Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.15);
         } else {  //                                                     PlayerEntity::createPlayerAttributes --v
             Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.1);
@@ -127,7 +127,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickStrong() {
-        if (hasTrait(Traits.TRAIT_STRONG)) {
+        if (hasTrait(Traits.STRONG)) {
             Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)).setBaseValue(1.5);
         } else {  //                                                    PlayerEntity::createPlayerAttributes --v
             Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)).setBaseValue(1.0);
@@ -135,7 +135,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private void tickHotIron() {
-        if (!hasTrait(Traits.TRAIT_HOT_IRON)) return;
+        if (!hasTrait(Traits.HOT_IRON)) return;
 
         if (getInventory().containsAny(PropSets.IRON_ITEMS)) setOnFireFor(3);
     }
@@ -156,7 +156,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     // Adapted version of ZombieEntity::tickMovement
     private void tickDamagedByLight() {
-        if (!hasTrait(Traits.TRAIT_DAMAGED_BY_LIGHT)) return;
+        if (!hasTrait(Traits.DAMAGED_BY_LIGHT)) return;
         if (!isAffectedByDaylight()) return;
 
         ItemStack helmet = this.getEquippedStack(EquipmentSlot.HEAD);
@@ -189,8 +189,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Inject(method = "eatFood", at = @At("RETURN"))
     private void traitedEatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        if (stack.getItem().equals(Items.ROTTEN_FLESH) && hasTrait(Traits.TRAIT_HARMFUL_ROTTEN_FLESH)) {
-            if (hasTrait(Traits.TRAIT_INVERT_EFFECTS)) {
+        if (stack.getItem().equals(Items.ROTTEN_FLESH) && hasTrait(Traits.HARMFUL_ROTTEN_FLESH)) {
+            if (hasTrait(Traits.INVERT_EFFECTS)) {
                 addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 30 * 20));
             } else {
                 addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 30 * 20));

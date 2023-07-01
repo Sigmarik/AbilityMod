@@ -28,7 +28,7 @@ public abstract class EnderPearlItemMixin extends Item {
             shift = At.Shift.AFTER
     ))
     private void traiedSetDelay(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
-        if (ServerState.hasTrait(user, Traits.TRAIT_EASY_PEARLS)) {
+        if (ServerState.hasTrait(user, Traits.EASY_PEARLS)) {
             user.getItemCooldownManager().set(Items.ENDER_PEARL, 0);
         }
     }
