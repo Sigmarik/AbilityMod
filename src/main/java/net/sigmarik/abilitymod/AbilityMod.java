@@ -2,9 +2,13 @@ package net.sigmarik.abilitymod;
 
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.sigmarik.abilitymod.command.TraitCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 public class AbilityMod implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "abilitymod";
