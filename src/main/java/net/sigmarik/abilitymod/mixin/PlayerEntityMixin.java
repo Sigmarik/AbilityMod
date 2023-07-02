@@ -62,11 +62,11 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, timer));
         }
         if (timer == 0) {
-            addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 20));
-            addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 20));
-            addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 20));
-            addStatusEffect(new StatusEffectInstance(StatusEffects.DARKNESS, 20));
-            addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 20));
+            addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 200));
+            addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 200));
+            addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200));
+            addStatusEffect(new StatusEffectInstance(StatusEffects.DARKNESS, 200));
+            addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 200));
         }
     }
 
@@ -120,7 +120,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     private void tickFast() {
         if (hasTrait(Traits.FAST)) {
-            Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.15);
+            Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.13);
         } else {  //                                                     PlayerEntity::createPlayerAttributes --v
             Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.1);
         }
@@ -187,7 +187,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         tickDamagedByLight();
     }
 
-    @Inject(method = "eatFood", at = @At("RETURN"))
+    @Inject(method = "eatFood", at = @At("HEAD"))
     private void traitedEatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
         if (stack.getItem().equals(Items.ROTTEN_FLESH) && hasTrait(Traits.HARMFUL_ROTTEN_FLESH)) {
             if (hasTrait(Traits.INVERT_EFFECTS)) {
