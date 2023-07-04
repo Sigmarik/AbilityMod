@@ -48,6 +48,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     private void tickFearOfWater() {
         if (!hasTrait(Traits.FEAR_OF_WATER) || !isWet()) return;
 
+        if (hasStatusEffect(StatusEffects.WATER_BREATHING)) return;
+
         damage(getDamageSources().magic(), 3);
     }
 
@@ -63,7 +65,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         }
         if (timer == 0) {
             addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 200));
-            addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 200));
             addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200));
             addStatusEffect(new StatusEffectInstance(StatusEffects.DARKNESS, 200));
             addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 200));
@@ -128,7 +129,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     private void tickStrong() {
         if (hasTrait(Traits.STRONG)) {
-            Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)).setBaseValue(1.5);
+            Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)).setBaseValue(4.0);
         } else {  //                                                    PlayerEntity::createPlayerAttributes --v
             Objects.requireNonNull(getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)).setBaseValue(1.0);
         }
