@@ -13,6 +13,7 @@ import net.minecraft.text.Text;
 import net.sigmarik.abilitymod.AbilityMod;
 import net.sigmarik.abilitymod.util.ServerState;
 
+import java.util.Objects;
 import java.util.Set;
 
 import static net.minecraft.server.command.CommandManager.*;
@@ -20,8 +21,6 @@ import static net.minecraft.server.command.CommandManager.*;
 public class TraitCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         TraitSuggestion traitSuggestionProvider = new TraitSuggestion();
-
-        CommandNode<ServerCommandSource> root = dispatcher.register(literal("trait"));
 
         dispatcher.register(
                 literal("trait").requires(source -> source.hasPermissionLevel(2))
@@ -87,12 +86,17 @@ public class TraitCommand {
         ServerState states = ServerState.getTraitStates(player.server);
         Set<String> traits = states.getTraitList(player.getUuid());
 
+        boolean isExecByPlayer = context.getSource().isExecutedByPlayer();
+
         if (traits.isEmpty()) {
-            player.sendMessage(Text.literal(player.getName().getString() + " has no traits."));
+            if (isExecByPlayer) Objects.requireNonNull(context.getSource().getPlayer())
+                    .sendMessage(Text.literal(player.getName().getString() + " has no traits."));
         } else {
-            player.sendMessage(Text.literal(player.getName().getString() + "'s traits:"));
+            if (isExecByPlayer) Objects.requireNonNull(context.getSource().getPlayer())
+                    .sendMessage(Text.literal(player.getName().getString() + "'s traits:"));
             for (String trait : traits) {
-                player.sendMessage(Text.literal(trait));
+                if (isExecByPlayer) Objects.requireNonNull(context.getSource().getPlayer())
+                        .sendMessage(Text.literal(trait));
             }
         }
 
