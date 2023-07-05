@@ -90,6 +90,12 @@ public class PropSets {
             Items.TNT_MINECART,
             Items.TRAPPED_CHEST,
             Items.TRIPWIRE_HOOK,
-            Items.WATER_BUCKET
+            Items.WATER_BUCKET,
+
+            Items.COD_BUCKET,
+            Items.PUFFERFISH_BUCKET,
+            Items.SALMON_BUCKET,
+            Items.TADPOLE_BUCKET,
+            Items.TROPICAL_FISH_BUCKET
     );
 }

@@ -48,7 +48,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     private void tickFearOfWater() {
         if (!hasTrait(Traits.FEAR_OF_WATER) || !isWet()) return;
 
-        if (hasStatusEffect(StatusEffects.WATER_BREATHING)) return;
+        if (hasStatusEffect(StatusEffects.WATER_BREATHING) && !isSubmergedInWater()) return;
 
         damage(getDamageSources().magic(), 3);
     }
