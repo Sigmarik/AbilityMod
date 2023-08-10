@@ -4,15 +4,20 @@
   "package": "net.sigmarik.abilitymod.mixin",
   "compatibilityLevel": "JAVA_17",
   "server": [
+    "EndermanEntityMixin",
     "EnderPearlEntityMixin",
     "EnderPearlItemMixin",
-    "EndermanEntityMixin",
     "PlayerEntityMixin",
-    "TargetPredicateMixin",
+    "PotionItemMixin",
     "StatusEffectMixin",
-    "PotionItemMixin"
+    "TargetPredicateMixin",
+    "PlayerManagerMixin",
+    "PlayerInventoryMixin",
+    "BlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+  ]
 }

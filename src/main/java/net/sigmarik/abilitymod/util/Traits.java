@@ -17,6 +17,14 @@ public class Traits {
     public static final String STRONG = "strong";
     public static final String HATED = "hated";
     public static final String HOT_IRON = "hot_iron";
+    public static final String COFFIN = "coffin";
+    public static final String RANDOM_RESPAWNS = "random_respawns";
+    public static final String SILK_TOUCH = "silk_touch";
+    public static final String SHAKY_HANDS = "shaky_hands";
+    public static final String TRUE_DARKNESS = "true_darkness";
+    public static final String MIMIC = "mimic";
+    public static final String DISPOSABLE_STONE = "disposable_stone";
+    public static final String TRICKY_MENDING = "tricky_mending";
     
     public static final Set<String> TRAITS = Set.of(
             EASY_PEARLS,
@@ -32,6 +40,14 @@ public class Traits {
             FAST,
             STRONG,
             HATED,
-            HOT_IRON
+            HOT_IRON,
+            COFFIN,
+            RANDOM_RESPAWNS,
+            SILK_TOUCH,
+            SHAKY_HANDS,
+            TRUE_DARKNESS,
+            MIMIC,
+            DISPOSABLE_STONE,
+            TRICKY_MENDING
     );
 }

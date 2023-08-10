@@ -1,5 +1,6 @@
 package net.sigmarik.abilitymod.util;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -98,12 +99,34 @@ public class ServerState extends PersistentState {
     }
 
     public static boolean hasTrait(PlayerEntity player, String trait) {
+        return hasTrait(player, trait, true);
+    }
+
+    public static boolean hasTrait(PlayerEntity player, String trait, boolean doMimicCheck) {
         if (player.getServer() == null) return false;
 
         ServerState state = getTraitStates(player.getServer());
 
         if (!state.data.containsKey(player.getUuid())) return false;
-        return state.data.get(player.getUuid()).traits.contains(trait);
+        if (state.data.get(player.getUuid()).traits.contains(trait)) return true;
+        else {
+            if (!doMimicCheck || !hasTrait(player, Traits.MIMIC, false)) {
+                return false;
+            }
+
+            PlayerEntity closest = null;
+
+            for (PlayerEntity playerEntity : player.getEntityWorld().getPlayers()) {
+                if (playerEntity == player) continue;
+                if (closest == null ||
+                        player.getPos().distanceTo(playerEntity.getPos()) <
+                                player.getPos().distanceTo(closest.getPos())) closest = playerEntity;
+            }
+
+            if (closest == null) return false;
+
+            return hasTrait(closest, trait, false);
+        }
     }
 
     public static int getAddictionTimer(PlayerEntity player) {

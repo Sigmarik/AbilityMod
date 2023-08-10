@@ -98,4 +98,19 @@ public class PropSets {
             Items.TADPOLE_BUCKET,
             Items.TROPICAL_FISH_BUCKET
     );
+
+    public static final Set<Item> DISPOSABLE_ITEMS = Set.of(
+            Items.NETHERRACK,
+            Items.WARPED_NYLIUM,
+            Items.CRIMSON_NYLIUM,
+            Items.GRASS_BLOCK,
+            Items.DIRT,
+            Items.STONE,
+            Items.COBBLESTONE,
+            Items.DEEPSLATE,
+            Items.GRANITE,
+            Items.ANDESITE,
+            Items.DIORITE,
+            Items.TUFF
+    );
 }
